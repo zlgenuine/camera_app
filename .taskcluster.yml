@@ -67,43 +67,43 @@ tasks:
       provisionerId: aws-provisioner-v1
       workerType: github-worker
       routes:
-        - 'notify.irc-channel.#android-ci.on-any'
+	- 'notify.irc-channel.#android-ci.on-any'
       scopes:
-        - queue:create-task:aws-provisioner-v1/github-worker
-        - queue:scheduler-id:taskcluster-github
-        - secrets:get:project/focus/preview-key-store
-        - queue:route:index.project.focus.android.preview-builds
-        - secrets:get:project/focus/firebase
-        - secrets:get:project/focus/nimbledroid
+	- queue:create-task:aws-provisioner-v1/github-worker
+	- queue:scheduler-id:taskcluster-github
+	- secrets:get:project/focus/preview-key-store
+	- queue:route:index.project.focus.android.preview-builds
+	- secrets:get:project/focus/firebase
+	- secrets:get:project/focus/nimbledroid
       payload:
-        maxRunTime: 7200
-        image: mozillamobile/focus-android:1.2
-        features:
-          taskclusterProxy: true
-        env:
-          TASK_ID: {$eval: as_slugid("decision_task")}
-          MOBILE_HEAD_REPOSITORY: ${event.repository.clone_url}
-          MOBILE_HEAD_BRANCH: ${event.ref}
-          MOBILE_HEAD_REV: ${event.after}
-        command:
-          - /bin/bash
-          - --login
-          - -cx
-          - >-
-            git fetch origin
-            && git config advice.detachedHead false
-            && git checkout ${event.after}
-            && python tools/taskcluster/schedule-master-build.py
-        artifacts:
-          public:
-            type: directory
-            path: /opt/focus-android/test_artifacts
-            expires: {$fromNow: '1 week'}
+	maxRunTime: 7200
+	image: mozillamobile/focus-android:1.2
+	features:
+	  taskclusterProxy: true
+	env:
+	  TASK_ID: {$eval: as_slugid("decision_task")}
+	  MOBILE_HEAD_REPOSITORY: ${event.repository.clone_url}
+	  MOBILE_HEAD_BRANCH: ${event.ref}
+	  MOBILE_HEAD_REV: ${event.after}
+	command:
+	  - /bin/bash
+	  - --login
+	  - -cx
+	  - >-
+	    git fetch origin
+	    && git config advice.detachedHead false
+	    && git checkout ${event.after}
+	    && python tools/taskcluster/schedule-master-build.py
+	artifacts:
+	  public:
+	    type: directory
+	    path: /opt/focus-android/test_artifacts
+	    expires: {$fromNow: '1 week'}
       metadata:
-        name: (Focus for Android) Schedule tasks
-        description: Scheduling tasks for master push
-        owner: ${event.pusher.name}@users.noreply.github.com
-        source: ${event.repository.url}
+	name: (Focus for Android) Schedule tasks
+	description: Scheduling tasks for master push
+	owner: ${event.pusher.name}@users.noreply.github.com
+          source: ${event.repository.url}
 ###############################################################################
 # Task: Release builds
 #
@@ -271,3 +271,4 @@ tasks:
           description: Decision task scheduled by cron task [${cron.task_id}](https://tools.taskcluster.net/tasks/${cron.task_id})
           owner: ${event.sender.login}@users.noreply.github.com
           source: ${repository}/raw/${event.release.tag_name}/.taskcluster.yml
+
